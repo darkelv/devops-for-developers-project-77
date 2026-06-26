@@ -40,6 +40,27 @@ HTTPS работает через уже существующий сертифи
 https://opsinfrapath.ru
 ```
 
+## Требования
+
+Перед запуском нужны:
+
+- Terraform
+- Ansible
+- Ansible Vault
+- `jq`
+- доступ к DigitalOcean
+- доступ к Datadog
+- домен `opsinfrapath.ru`, направленный на nameserver-ы DigitalOcean
+- существующий сертификат DigitalOcean с именем `opsinfrapath.ru`
+
+В корне проекта должен быть файл с паролем от Ansible Vault:
+
+```bash
+.vault_password
+```
+
+Этот файл не коммитится.
+
 ## Секреты
 
 Токен DigitalOcean хранится в Ansible Vault:
