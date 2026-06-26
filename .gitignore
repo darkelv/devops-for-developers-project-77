@@ -1,0 +1,7 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+*.auto.tfvars
+secret.*
+.vault_password
+.idea/
