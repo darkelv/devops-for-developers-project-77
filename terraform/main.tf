@@ -11,11 +11,6 @@ terraform {
       source  = "hashicorp/local"
       version = "~> 2.5"
     }
-
-    tls = {
-      source  = "hashicorp/tls"
-      version = "~> 4.0"
-    }
   }
 }
 
@@ -81,36 +76,6 @@ resource "digitalocean_database_firewall" "postgres" {
   }
 }
 
-resource "tls_private_key" "load_balancer" {
-  algorithm = "RSA"
-  rsa_bits  = 2048
-}
-
-resource "tls_self_signed_cert" "load_balancer" {
-  private_key_pem = tls_private_key.load_balancer.private_key_pem
-
-  subject {
-    common_name  = var.domain_name
-    organization = "Hexlet"
-  }
-
-  dns_names             = [var.domain_name]
-  validity_period_hours = 8760
-
-  allowed_uses = [
-    "digital_signature",
-    "key_encipherment",
-    "server_auth",
-  ]
-}
-
-resource "digitalocean_certificate" "load_balancer" {
-  name             = "${local.project_name}-self-signed"
-  type             = "custom"
-  private_key      = tls_private_key.load_balancer.private_key_pem
-  leaf_certificate = tls_self_signed_cert.load_balancer.cert_pem
-}
-
 resource "digitalocean_loadbalancer" "web" {
   name                   = "${local.project_name}-lb"
   region                 = var.region
@@ -133,7 +98,7 @@ resource "digitalocean_loadbalancer" "web" {
     entry_port       = 443
     target_protocol  = "http"
     target_port      = var.application_port
-    certificate_name = digitalocean_certificate.load_balancer.name
+    certificate_name = var.certificate_name
   }
 
   healthcheck {
@@ -145,6 +110,18 @@ resource "digitalocean_loadbalancer" "web" {
     healthy_threshold        = 2
     unhealthy_threshold      = 3
   }
+}
+
+resource "digitalocean_domain" "app" {
+  name = var.domain_name
+}
+
+resource "digitalocean_record" "app" {
+  domain = digitalocean_domain.app.name
+  type   = "A"
+  name   = "@"
+  value  = digitalocean_loadbalancer.web.ip
+  ttl    = 300
 }
 
 resource "digitalocean_firewall" "web" {

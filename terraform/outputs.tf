@@ -4,8 +4,18 @@ output "load_balancer_ip" {
 }
 
 output "load_balancer_https_url" {
-  description = "HTTPS URL of the load balancer."
-  value       = "https://${digitalocean_loadbalancer.web.ip}"
+  description = "HTTPS URL of the application."
+  value       = "https://${var.domain_name}"
+}
+
+output "domain_name" {
+  description = "Application domain."
+  value       = var.domain_name
+}
+
+output "domain_record" {
+  description = "DNS record that points to the load balancer."
+  value       = digitalocean_record.app.fqdn
 }
 
 output "web_public_ips" {

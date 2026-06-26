@@ -12,6 +12,8 @@ Terraform создает:
 - 2 виртуальные машины для веб-серверов
 - Load Balancer, который принимает HTTPS-запросы на порт `443`
 - Managed PostgreSQL для приложения
+- домен `opsinfrapath.ru`
+- DNS A-record, который указывает на Load Balancer
 - firewall для доступа к веб-серверам
 - файл `ansible/inventory.ini` для Ansible
 
@@ -21,7 +23,14 @@ Ansible разворачивает на веб-серверах:
 - Redmine container
 - `.env` файл с подключением к Managed PostgreSQL
 
-HTTPS сделан через self-signed сертификат. Для учебной проверки этого достаточно, но браузер будет показывать предупреждение о сертификате.
+HTTPS работает через уже существующий сертификат DigitalOcean с именем `opsinfrapath.ru`.
+Домен у регистратора должен быть направлен на nameserver-ы DigitalOcean.
+
+Приложение после деплоя будет доступно по адресу:
+
+```text
+https://opsinfrapath.ru
+```
 
 ## Секреты
 

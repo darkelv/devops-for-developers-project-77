@@ -71,7 +71,13 @@ variable "database_user" {
 }
 
 variable "domain_name" {
-  description = "Domain name for the self-signed HTTPS certificate."
+  description = "Domain name for the application."
   type        = string
-  default     = "redmine.example.com"
+  default     = "opsinfrapath.ru"
+}
+
+variable "certificate_name" {
+  description = "Existing DigitalOcean certificate name for HTTPS."
+  type        = string
+  default     = "opsinfrapath.ru"
 }
