@@ -1,9 +1,13 @@
 # Terraform
 
-В этой директории будут Terraform-файлы для описания облачной инфраструктуры.
+В этой директории лежат Terraform-файлы для облачной инфраструктуры.
 
-Секретные значения не нужно хранить здесь в открытом виде. Они лежат в Ansible Vault:
+Terraform создает:
 
-```bash
-ansible-vault view ../ansible/group_vars/all/terraform_vault.yml --vault-password-file ../.vault_password
-```
+- 2 виртуальные машины для веб-приложения
+- HTTPS Load Balancer
+- Managed PostgreSQL
+- firewall для веб-серверов
+- `ansible/inventory.ini`
+
+Секреты не хранятся здесь в открытом виде. Команда `make tfvars` создает локальный файл `secret.auto.tfvars` из Ansible Vault.
