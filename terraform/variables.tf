@@ -81,3 +81,27 @@ variable "certificate_name" {
   type        = string
   default     = "opsinfrapath.ru"
 }
+
+variable "datadog_api_key" {
+  description = "Datadog API key."
+  type        = string
+  sensitive   = true
+}
+
+variable "datadog_app_key" {
+  description = "Datadog application key."
+  type        = string
+  sensitive   = true
+}
+
+variable "datadog_site" {
+  description = "Datadog site."
+  type        = string
+  default     = "datadoghq.eu"
+}
+
+variable "datadog_env" {
+  description = "Datadog environment tag."
+  type        = string
+  default     = "prod"
+}

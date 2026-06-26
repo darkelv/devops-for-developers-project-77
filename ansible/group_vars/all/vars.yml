@@ -5,3 +5,26 @@ redmine_dir: /opt/redmine
 redmine_port: 3000
 
 redmine_secret_key_base: "{{ vault_redmine_secret_key_base }}"
+
+datadog_api_key: "{{ vault_datadog_api_key }}"
+datadog_site: datadoghq.eu
+datadog_env: prod
+datadog_config:
+  env: "{{ datadog_env }}"
+  tags:
+    - env:{{ datadog_env }}
+    - service:redmine
+datadog_checks:
+  http_check:
+    init_config:
+    instances:
+      - name: redmine-local
+        url: "http://localhost:{{ redmine_port }}/"
+        timeout: 5
+        method: GET
+        http_response_status_code: "200"
+        content_match: Redmine
+        collect_response_time: true
+        tags:
+          - env:{{ datadog_env }}
+          - service:redmine

@@ -9,7 +9,7 @@ ANSIBLE_OUTPUT_VARS = $(ANSIBLE_DIR)/group_vars/all/terraform_outputs.yml
 TERRAFORM = terraform -chdir=$(TERRAFORM_DIR)
 PLAYBOOK = ansible-playbook --vault-password-file $(VAULT_PASSWORD_FILE) -i $(ANSIBLE_INVENTORY)
 
-.PHONY: tfvars init fmt validate plan infra destroy output install_requirements ansible_check ansible_vars prepare deploy clean vault_view vault_app_view
+.PHONY: tfvars init fmt validate plan infra destroy output install_requirements ansible_check ansible_vars prepare deploy datadog clean vault_view vault_edit vault_app_view vault_app_edit
 
 tfvars:
 	ansible-vault view $(VAULT_FILE) --vault-password-file $(VAULT_PASSWORD_FILE) \
@@ -62,7 +62,10 @@ prepare: install_requirements
 	$(PLAYBOOK) $(ANSIBLE_DIR)/playbook.yml --tags prepare
 
 deploy: install_requirements ansible_vars
-	$(PLAYBOOK) $(ANSIBLE_DIR)/playbook.yml --tags prepare,deploy
+	$(PLAYBOOK) $(ANSIBLE_DIR)/playbook.yml --tags prepare,deploy,datadog
+
+datadog: install_requirements
+	$(PLAYBOOK) $(ANSIBLE_DIR)/playbook.yml --tags datadog
 
 clean:
 	rm -f $(TFVARS_FILE) $(ANSIBLE_OUTPUT_VARS)
@@ -70,5 +73,11 @@ clean:
 vault_view:
 	ansible-vault view $(VAULT_FILE) --vault-password-file $(VAULT_PASSWORD_FILE)
 
+vault_edit:
+	ansible-vault edit $(VAULT_FILE) --vault-password-file $(VAULT_PASSWORD_FILE)
+
 vault_app_view:
 	ansible-vault view $(APP_VAULT_FILE) --vault-password-file $(VAULT_PASSWORD_FILE)
+
+vault_app_edit:
+	ansible-vault edit $(APP_VAULT_FILE) --vault-password-file $(VAULT_PASSWORD_FILE)

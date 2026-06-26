@@ -11,11 +11,23 @@ terraform {
       source  = "hashicorp/local"
       version = "~> 2.5"
     }
+
+    datadog = {
+      source  = "DataDog/datadog"
+      version = "4.13.0"
+    }
   }
 }
 
 provider "digitalocean" {
   token = var.do_token
+}
+
+provider "datadog" {
+  api_key  = var.datadog_api_key
+  app_key  = var.datadog_app_key
+  api_url  = "https://api.${var.datadog_site}/"
+  validate = "false"
 }
 
 locals {
@@ -122,6 +134,30 @@ resource "digitalocean_record" "app" {
   name   = "@"
   value  = digitalocean_loadbalancer.web.ip
   ttl    = 300
+}
+
+resource "datadog_monitor" "redmine_http_check" {
+  name     = "Redmine HTTP check"
+  type     = "service check"
+  query    = "\"http.can_connect\".over(\"env:${var.datadog_env}\",\"service:redmine\").by(\"host\").last(2).count_by_status()"
+  message  = "Redmine is unavailable on {{host.name}}. Datadog Agent cannot get HTTP 200 from the local application."
+  validate = false
+
+  monitor_thresholds {
+    ok       = 1
+    warning  = 1
+    critical = 2
+  }
+
+  include_tags      = true
+  notify_no_data    = true
+  no_data_timeframe = 10
+
+  tags = [
+    "env:${var.datadog_env}",
+    "service:redmine",
+    "managed_by:terraform",
+  ]
 }
 
 resource "digitalocean_firewall" "web" {

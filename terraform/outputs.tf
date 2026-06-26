@@ -55,3 +55,8 @@ output "ansible_inventory_path" {
   description = "Generated Ansible inventory."
   value       = local_file.ansible_inventory.filename
 }
+
+output "datadog_monitor_id" {
+  description = "Datadog monitor ID for Redmine HTTP check."
+  value       = datadog_monitor.redmine_http_check.id
+}

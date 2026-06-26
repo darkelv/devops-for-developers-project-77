@@ -22,6 +22,14 @@ Ansible разворачивает на веб-серверах:
 - Docker
 - Redmine container
 - `.env` файл с подключением к Managed PostgreSQL
+- Datadog Agent
+- Datadog `http_check`, который проверяет `http://localhost:3000/` на каждом веб-сервере
+
+Terraform также создает Datadog alert:
+
+- monitor `Redmine HTTP check`
+- проверка идет по service check `http.can_connect`
+- alert группируется по `host`, поэтому каждый веб-сервер проверяется отдельно
 
 HTTPS работает через уже существующий сертификат DigitalOcean с именем `opsinfrapath.ru`.
 Домен у регистратора должен быть направлен на nameserver-ы DigitalOcean.
@@ -40,11 +48,26 @@ https://opsinfrapath.ru
 ansible/group_vars/all/terraform_vault.yml
 ```
 
+Там же лежат переменные для Terraform Datadog provider:
+
+```yaml
+datadog_api_key: "..."
+datadog_app_key: "..."
+```
+
+`datadog_app_key` нужно заменить на реальный Datadog application key:
+
+```bash
+make vault_edit
+```
+
 Секрет Redmine хранится отдельно:
 
 ```bash
 ansible/group_vars/all/vault.yml
 ```
+
+В этом же файле лежит `vault_datadog_api_key`, который использует Ansible для установки Datadog Agent.
 
 Посмотреть файл можно так:
 
@@ -134,6 +157,12 @@ make ansible_vars
 
 ```bash
 make prepare
+```
+
+Установить или обновить Datadog Agent отдельно:
+
+```bash
+make datadog
 ```
 
 Развернуть Redmine:

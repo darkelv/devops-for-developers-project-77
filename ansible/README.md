@@ -13,5 +13,6 @@ playbook.yml
 ```
 
 Он устанавливает Docker и запускает Redmine container на веб-серверах.
+Также он устанавливает Datadog Agent и настраивает `http_check` для локальной проверки Redmine на `http://localhost:3000/`.
 
 Локальный файл `group_vars/all/terraform_outputs.yml` создается командой `make ansible_vars` и не коммитится, потому что содержит пароль Managed PostgreSQL.

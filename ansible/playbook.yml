@@ -8,7 +8,7 @@
       ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 3600
-      tags: [prepare, deploy]
+      tags: [prepare, deploy, datadog]
 
   tasks:
     - name: Install Docker packages
@@ -64,3 +64,8 @@
         volumes:
           - redmine-files:/usr/src/redmine/files
       tags: deploy
+
+    - name: Install Datadog Agent
+      ansible.builtin.import_role:
+        name: datadog.dd.agent
+      tags: datadog
