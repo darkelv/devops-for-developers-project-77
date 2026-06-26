@@ -1,0 +1,66 @@
+---
+- name: Prepare web servers and deploy Redmine
+  hosts: webservers
+  become: true
+
+  pre_tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+      tags: [prepare, deploy]
+
+  tasks:
+    - name: Install Docker packages
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - python3-docker
+        state: present
+      tags: prepare
+
+    - name: Start Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+      tags: prepare
+
+    - name: Create Redmine directory
+      ansible.builtin.file:
+        path: "{{ redmine_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      tags: deploy
+
+    - name: Create Redmine env file
+      ansible.builtin.template:
+        src: templates/redmine.env.j2
+        dest: "{{ redmine_dir }}/.env"
+        owner: root
+        group: root
+        mode: "0600"
+      register: redmine_env_file
+      tags: deploy
+
+    - name: Pull Redmine image
+      community.docker.docker_image:
+        name: "{{ redmine_image }}"
+        source: pull
+      tags: deploy
+
+    - name: Run Redmine container
+      community.docker.docker_container:
+        name: "{{ redmine_container }}"
+        image: "{{ redmine_image }}"
+        state: started
+        restart_policy: always
+        env_file: "{{ redmine_dir }}/.env"
+        recreate: "{{ redmine_env_file.changed }}"
+        published_ports:
+          - "{{ redmine_port }}:3000"
+        volumes:
+          - redmine-files:/usr/src/redmine/files
+      tags: deploy

@@ -6,3 +6,4 @@ secret.*
 .vault_password
 .idea/
 ansible/inventory.ini
+ansible/group_vars/all/terraform_outputs.yml
